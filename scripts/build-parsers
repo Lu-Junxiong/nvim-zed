@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)
+for language in json yaml; do
+    source_dir="$repo_dir/vendor/tree-sitter-$language/src"
+    sources=("$source_dir/parser.c")
+    if [[ -f $source_dir/scanner.c ]]; then sources+=("$source_dir/scanner.c"); fi
+    "${CC:-cc}" -O2 -fPIC -shared -I "$source_dir" "${sources[@]}" -o "$repo_dir/config/parser/$language.so"
+done

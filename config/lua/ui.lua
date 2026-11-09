@@ -4,7 +4,6 @@ function M.setup_icons()
   local style = vim.env.NVIM_ZED_ICONS or 'glyph'
   assert(style == 'glyph' or style == 'ascii', 'NVIM_ZED_ICONS must be glyph or ascii')
   require('mini.icons').setup({ style = style })
-  MiniIcons.mock_nvim_web_devicons()
 end
 
 function M.setup_clues()

@@ -92,55 +92,9 @@ function M.toggle_terminal()
   end
 end
 
-local function toggle_tree()
-  changing_layout = true
-  local tree = require('nvim-tree.api').tree
-  if tree.is_visible() then
-    tree.close()
-    M.editor()
-  else
-    M.editor()
-    tree.open()
-  end
-  -- Opening the tree can create a full-height split; keep the terminal below it.
-  local win = terminal_window()
-  if win then vim.api.nvim_win_call(win, function() vim.cmd('wincmd J') end) end
-  resize_terminal()
-  changing_layout = false
-end
-
 function M.setup()
-  require('nvim-tree').setup({
-    view = { side = 'right', width = 30 },
-    actions = { open_file = { quit_on_open = false, resize_window = false } },
-    update_focused_file = { enable = true },
-    renderer = {
-      highlight_git = 'name',
-      icons = {
-        show = { file = true, folder = true, folder_arrow = true, git = false, modified = false, diagnostics = false, bookmarks = false },
-        glyphs = {
-          default = MiniIcons.get('default', 'file'),
-          folder = {
-            default = MiniIcons.get('directory', ''),
-            open = MiniIcons.get('directory', ''),
-            empty = MiniIcons.get('directory', ''),
-            empty_open = MiniIcons.get('directory', ''),
-            symlink = MiniIcons.get('directory', ''),
-            symlink_open = MiniIcons.get('directory', ''),
-            arrow_closed = '>', arrow_open = 'v',
-          },
-        },
-      },
-    },
-    on_attach = function(buf)
-      local api = require('nvim-tree.api')
-      api.config.mappings.default_on_attach(buf)
-      vim.keymap.set('n', 'l', api.node.open.edit, { buffer = buf, desc = 'Open' })
-      vim.keymap.set('n', 'h', api.node.navigate.parent_close, { buffer = buf, desc = 'Close folder' })
-    end,
-  })
   local map = vim.keymap.set
-  map('n', '<leader>e', toggle_tree, { desc = 'Toggle file tree' })
+  map('n', '<leader>e', function() require('file_manager').toggle() end, { desc = 'Yazi file browser' })
   map('n', '<C-\\>', M.toggle_terminal, { desc = 'Toggle terminal' })
   map('t', '<C-\\>', [[<C-\><C-n><Cmd>lua require('panels').toggle_terminal()<CR>]], { desc = 'Toggle terminal' })
   map('t', '<Esc><Esc>', [[<C-\><C-n>]], { desc = 'Terminal normal mode' })
@@ -170,7 +124,6 @@ function M.setup()
         M.editor()
         editor_win = vim.api.nvim_get_current_win()
         require('startup').open_if_empty()
-        require('nvim-tree.api').tree.open()
         M.editor()
         vim.cmd.stopinsert()
         changing_layout = false

@@ -9,6 +9,7 @@ function M.setup()
     footer = '方向键选择 · Enter 打开 · Ctrl-\\ 终端',
     items = {
       { name = 'f  查找文件     Ctrl-p', section = '开始', action = function() MiniPick.builtin.files({ tool = 'rg' }) end },
+      { name = 'e  浏览文件     空格 e', section = '开始', action = function() require('file_manager').open() end },
       { name = 'g  搜索文本     空格 /', section = '开始', action = function() MiniPick.builtin.grep_live({ tool = 'rg' }) end },
       { name = 'n  新建文件', section = '开始', action = 'enew' },
       { name = 'h  快捷键说明', section = '开始', action = function()

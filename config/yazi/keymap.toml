@@ -1,0 +1,4 @@
+[mgr]
+prepend_keymap = [
+  { on = "s", run = "search --via=rg", desc = "Search files with ripgrep" },
+]

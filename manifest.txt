@@ -1,6 +1,5 @@
 Neovim v0.12.6
 nvim-mini/mini.nvim f9ac12d7cbd2563cfc2cce9a8152fc8df2ad0d6f
-nvim-tree/nvim-tree.lua 7e1da84aaffb413e1fa47b3895e5caa12501142d
 hrsh7th/nvim-cmp fe29aba4117227a6df637bc41e4b4fb4e98864a0
 hrsh7th/cmp-buffer b74fab3656eea9de20a9b8116afa3cfc4ec09657
 hrsh7th/cmp-path c642487086dbd9a93160e1679a1327be111cbc25
@@ -11,3 +10,8 @@ ELF required GLIBC symbol version: 2.34
 External tools tested: ty 0.0.99, ruff 0.16.10
 olimorris/onedarkpro.nvim 24c806cb85c1f84d9faaff457cf7aa87c685a070
 folke/flash.nvim 5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a
+tree-sitter-json 254c42a6476413b776221e03982ac8ae159eeb72
+tree-sitter-yaml a1c4812a73ec5e089de8e441fdea3a921e8d5079
+Outline parser binaries: Linux x86_64; JSON has no GLIBC symbols, YAML requires GLIBC_2.2.5
+Yazi v26.9.1 (static x86_64 Linux build)
+mime-ext.yazi c0529fc34e4649effb79ff6f4a86aec46beebb7f
