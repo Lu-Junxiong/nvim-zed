@@ -116,7 +116,21 @@ function M.setup()
     update_focused_file = { enable = true },
     renderer = {
       highlight_git = 'name',
-      icons = { show = { file = false, folder = false, folder_arrow = false, git = false, modified = false, diagnostics = false, bookmarks = false } },
+      icons = {
+        show = { file = true, folder = true, folder_arrow = true, git = false, modified = false, diagnostics = false, bookmarks = false },
+        glyphs = {
+          default = MiniIcons.get('default', 'file'),
+          folder = {
+            default = MiniIcons.get('directory', ''),
+            open = MiniIcons.get('directory', ''),
+            empty = MiniIcons.get('directory', ''),
+            empty_open = MiniIcons.get('directory', ''),
+            symlink = MiniIcons.get('directory', ''),
+            symlink_open = MiniIcons.get('directory', ''),
+            arrow_closed = '>', arrow_open = 'v',
+          },
+        },
+      },
     },
     on_attach = function(buf)
       local api = require('nvim-tree.api')

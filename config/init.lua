@@ -50,9 +50,10 @@ vim.diagnostic.config({
   float = { border = 'rounded', source = true },
 })
 
-require('mini.tabline').setup({ show_icons = false, tabpage_section = 'right' })
+require('ui').setup_icons()
+require('mini.tabline').setup({ show_icons = true, tabpage_section = 'right' })
 require('mini.statusline').setup({ use_icons = false })
-require('mini.pick').setup()
+require('mini.pick').setup({ source = { show = function(buf, items, query) MiniPick.default_show(buf, items, query, { show_icons = true }) end } })
 require('mini.extra').setup()
 require('mini.bufremove').setup()
 require('panels').setup()
@@ -90,3 +91,8 @@ map('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end,
 map('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = 'Next diagnostic' })
 map('n', '<Esc>', '<Cmd>nohlsearch<CR>', { desc = 'Clear search highlight' })
 map('n', '<leader>?', function() require('panels').editor(); vim.cmd('edit ' .. vim.fn.fnameescape(root .. '/README.md')) end, { desc = 'Help' })
+map('n', '<leader>q', function()
+  require('panels').editor()
+  MiniExtra.pickers.diagnostic({ scope = 'all', sort_by = 'severity' }, { source = { name = 'Diagnostics' } })
+end, { desc = '诊断列表' })
+require('ui').setup_clues()

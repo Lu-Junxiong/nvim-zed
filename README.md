@@ -23,7 +23,7 @@ tar -xzf nvim-zed-linux-x86_64.tar.gz
 
 - Linux x86_64，glibc >= 2.34，以及系统 libgcc_s.so.1；不适用于 Alpine/musl。
 - Bash、GNU coreutils；PATH 中已有 `ty`、`ruff`、`rg`、`git`。
-- 支持真彩色的终端；字体和字号在终端里设置，不需要 Nerd Font。
+- 支持真彩色的终端；字体和字号在终端里设置，完整文件图标需要终端选择 Nerd Font；也可使用下述 ASCII 图标模式。
 - 解压目录可写。配置与插件已内置，运行时不安装、不更新、不联网下载。
 
 包含 Neovim 0.12.6。已验证 ty 0.0.99、Ruff 0.16.10；插件版本见 manifest.txt。
@@ -55,6 +55,7 @@ tar -xzf nvim-zed-linux-x86_64.tar.gz
 | Ruff 格式化 | `Space f` |
 | 整理 imports／代码修复菜单 | `Space ci` / `Space ca` |
 | 查看诊断 | `Space d` |
+| 诊断列表（按严重程度排序） | `Space q` |
 | 上一个／下一个诊断 | `[d` / `]d` |
 | 上一个／下一个 Git 修改块 | `[c` / `]c` |
 | 预览修改块 | `Space hp` |
@@ -128,3 +129,15 @@ unshare -Urn ./tests/check
 ```
 
 也可以用 `./tests/check /path/to/extracted/nvim-zed` 验证解压后的精简包。检查脚本本身不会包含在离线包中。
+
+## 图标、快捷键提示和诊断列表
+
+文件树、顶部标签和搜索列表显示文件类型图标。完整字形需要在本地终端选择 Nerd Font；SSH 连接时也在本地终端设置。若出现方框或乱码，可以先使用字符图标：
+
+```bash
+NVIM_ZED_ICONS=ascii ./nvim-zed/run /path/to/project
+```
+
+普通模式按空格，停留 300 毫秒会显示可用快捷键；继续按键执行，Esc 取消。快速连续输入快捷键会直接执行。
+
+`Space q` 汇总语言服务已经报告的诊断，错误优先；输入文字筛选、Ctrl-n/p 或方向键选择、Enter 跳转、Esc 关闭。列表范围取决于语言服务已检查的文件，不保证扫描所有未打开文件。`Space d` 继续查看光标处的诊断详情。
