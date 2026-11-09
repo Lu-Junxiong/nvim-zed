@@ -1,7 +1,0 @@
-*.code-workspace
-*.cache
-.luarc.json
-deps/**/*
-minimal.lua
-todo.md
-media/**/*

@@ -1,18 +1,4 @@
-# Keep upstream development material in Git, but omit it from portable archives.
+# Portable archives contain runtime files; development material stays in Git.
 /tests export-ignore
-plugins/*/.github export-ignore
-plugins/*/.gitignore export-ignore
-plugins/*/.gitattributes export-ignore
-plugins/*/tests export-ignore
-plugins/*/test export-ignore
-plugins/*/examples export-ignore
-plugins/*/extras export-ignore
-plugins/*/scripts export-ignore
-plugins/*/readmes export-ignore
-plugins/*/Makefile export-ignore
-plugins/*/CONTRIBUTING.md export-ignore
-plugins/*/CODE_OF_CONDUCT.md export-ignore
-plugins/*/MAINTAINING.md export-ignore
-plugins/*/TESTING.md export-ignore
 /vendor export-ignore
-/scripts/build-parsers export-ignore
+/scripts export-ignore

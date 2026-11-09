@@ -1,4 +1,4 @@
-Neovim v0.12.6
+Neovim v0.12.5 (legacy glibc build)
 nvim-mini/mini.nvim f9ac12d7cbd2563cfc2cce9a8152fc8df2ad0d6f
 hrsh7th/nvim-cmp fe29aba4117227a6df637bc41e4b4fb4e98864a0
 hrsh7th/cmp-buffer b74fab3656eea9de20a9b8116afa3cfc4ec09657
@@ -6,7 +6,7 @@ hrsh7th/cmp-path c642487086dbd9a93160e1679a1327be111cbc25
 hrsh7th/cmp-nvim-lsp cd4ee08a988deb47ac3726f418fb27fe1a95729d
 lewis6991/gitsigns.nvim ef707fb93301a9b856f36eae4c8f56f5b988a794
 Validated: Linux x86_64, glibc 2.39
-ELF required GLIBC symbol version: 2.34
+ELF required GLIBC symbol version: 2.17
 External tools tested: ty 0.0.99, ruff 0.16.10
 olimorris/onedarkpro.nvim 24c806cb85c1f84d9faaff457cf7aa87c685a070
 folke/flash.nvim 5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a
@@ -15,3 +15,5 @@ tree-sitter-yaml a1c4812a73ec5e089de8e441fdea3a921e8d5079
 Outline parser binaries: Linux x86_64; JSON has no GLIBC symbols, YAML requires GLIBC_2.2.5
 Yazi v26.9.1 (static x86_64 Linux build)
 mime-ext.yazi c0529fc34e4649effb79ff6f4a86aec46beebb7f
+Neovim build source: https://github.com/neovim/neovim-releases/releases/tag/stable
+Old-system compatibility: binary symbol inspection, not tested on the target system
