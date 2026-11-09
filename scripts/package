@@ -5,7 +5,7 @@ archive="$repo_dir/nvim-zed-linux-x86_64.tar.gz"
 archive_tmp=$(mktemp "$repo_dir/.nvim-zed-package.XXXXXX")
 trap 'rm -f -- "$archive_tmp"' EXIT
 # Prefix members while preserving relative symlink targets (bin/* and Yazi ASCII).
-tar --sort=name --transform='flags=r;s,^,nvim-zed/,' -C "$repo_dir" -cf - \
-    run README.md manifest.txt bin config neovim plugins yazi | gzip -9 > "$archive_tmp"
+tar --sort=name --exclude=__pycache__ --exclude='*.pyc' --transform='flags=r;s,^,nvim-zed/,' -C "$repo_dir" -cf - \
+    run README.md manifest.txt bin config neovim plugins yazi tools | gzip -9 > "$archive_tmp"
 mv -- "$archive_tmp" "$archive"
 printf '%s\n' "$archive"

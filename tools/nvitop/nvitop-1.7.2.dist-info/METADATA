@@ -1,0 +1,65 @@
+Metadata-Version: 2.4
+Name: nvitop
+Version: 1.7.2
+Summary: An interactive NVIDIA-GPU process viewer and beyond, the one-stop solution for GPU process management.
+Author-email: Xuehai Pan <XuehaiPan@pku.edu.cn>
+License: Apache-2.0 AND GPL-3.0-only
+Project-URL: Homepage, https://github.com/XuehaiPan/nvitop
+Project-URL: Repository, https://github.com/XuehaiPan/nvitop
+Project-URL: Documentation, https://nvitop.readthedocs.io
+Project-URL: Bug Report, https://github.com/XuehaiPan/nvitop/issues
+Keywords: nvidia,nvidia-smi,NVIDIA,NVML,CUDA,GPU,top,monitoring
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Programming Language :: Python :: 3.15
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Environment :: GPU
+Classifier: Environment :: GPU :: NVIDIA CUDA
+Classifier: Environment :: Console
+Classifier: Environment :: Console :: Curses
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: System Administrators
+Classifier: Topic :: System :: Hardware
+Classifier: Topic :: System :: Monitoring
+Classifier: Topic :: System :: Systems Administration
+Classifier: Topic :: Utilities
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+License-File: COPYING
+Requires-Dist: nvidia-ml-py<13.616.0a0,>=11.450.51
+Requires-Dist: psutil>=5.6.6
+Requires-Dist: colorama>=0.4.0; platform_system == "Windows"
+Requires-Dist: windows-curses>=2.2.0; platform_system == "Windows"
+Provides-Extra: exporter
+Requires-Dist: nvitop-exporter; extra == "exporter"
+Provides-Extra: prometheus
+Requires-Dist: nvitop-exporter; extra == "prometheus"
+Provides-Extra: lint
+Requires-Dist: ruff; extra == "lint"
+Requires-Dist: pylint[spelling]; extra == "lint"
+Requires-Dist: xdoctest; extra == "lint"
+Requires-Dist: mypy; extra == "lint"
+Requires-Dist: typing-extensions; extra == "lint"
+Requires-Dist: pre-commit; extra == "lint"
+Provides-Extra: cuda10
+Requires-Dist: nvidia-ml-py==11.450.51; extra == "cuda10"
+Provides-Extra: cuda11
+Requires-Dist: nvidia-ml-py<=11.525.150,>=11.450.51; extra == "cuda11"
+Provides-Extra: cuda12
+Requires-Dist: nvidia-ml-py<=12.575.51,>=12.535.77; extra == "cuda12"
+Provides-Extra: cuda13
+Requires-Dist: nvidia-ml-py<=13.615.71,>=13.580.65; extra == "cuda13"
+Dynamic: license-file
+Dynamic: provides-extra

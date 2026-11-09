@@ -2,6 +2,8 @@ local M = {}
 
 function M.cycle(direction, insert)
   require('file_manager').close()
+  require('monitor').close()
+  require('data_preview').close()
   require('panels').editor()
   local buffers = {}
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do

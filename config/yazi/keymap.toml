@@ -1,4 +1,5 @@
 [mgr]
 prepend_keymap = [
+  { on = "<C-p>", run = "plugin zed-preview", desc = "Preview CSV / TSV / Parquet in Neovim" },
   { on = "s", run = "search --via=rg", desc = "Search files with ripgrep" },
 ]

@@ -39,3 +39,7 @@ timeout 30s "$bundle_dir/neovim/bin/nvim" --clean -l "$repo_dir/tests/outline.lu
 timeout 40s "$bundle_dir/neovim/bin/nvim" --clean -l "$repo_dir/tests/navigation.lua"
 timeout 30s "$bundle_dir/neovim/bin/nvim" --clean -l "$repo_dir/tests/terminal_keys.lua"
 timeout 60s "$bundle_dir/neovim/bin/nvim" --clean -l "$repo_dir/tests/check.lua"
+timeout 30s "$bundle_dir/neovim/bin/nvim" --clean -l "$repo_dir/tests/review.lua"
+if [[ -n ${ZED_TEST_PYTHON:-} ]]; then
+    timeout 60s "$bundle_dir/neovim/bin/nvim" --clean -l "$repo_dir/tests/ml.lua"
+fi

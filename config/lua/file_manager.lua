@@ -17,12 +17,21 @@ local function finish(state, code)
   if not state.cancelled and code == 0 and vim.fn.filereadable(state.chooser) == 1 then
     files = vim.fn.readfile(state.chooser)
   end
+  local preview
+  if not state.cancelled and code == 0 and vim.fn.filereadable(state.preview) == 1 then
+    preview = table.concat(vim.fn.readfile(state.preview, 'b'), '\n')
+  end
   vim.fn.delete(state.chooser)
+  vim.fn.delete(state.preview)
   if vim.api.nvim_win_is_valid(state.win) then vim.api.nvim_win_close(state.win, true) end
   if vim.api.nvim_buf_is_valid(state.buf) then vim.api.nvim_buf_delete(state.buf, { force = true }) end
   if vim.v.exiting ~= vim.NIL then return end
   vim.cmd.stopinsert()
   require('panels').editor()
+  if preview and preview ~= '' then
+    require('data_preview').open(preview)
+    return
+  end
   for index, path in ipairs(files) do
     -- Use API buffer names so spaces and Ex metacharacters remain literal.
     local buf = vim.fn.bufadd(path)
@@ -49,13 +58,16 @@ function M.open()
     vim.cmd.startinsert()
     return
   end
+  require('monitor').close()
+  require('data_preview').close()
   require('panels').editor()
   local path = vim.api.nvim_buf_get_name(0)
   if vim.bo.buftype ~= '' or path == '' then path = vim.fn.getcwd() end
   if not vim.uv.fs_stat(path) then path = vim.fs.dirname(path) end
   local buf = vim.api.nvim_create_buf(false, true)
   local config = vim.tbl_extend('force', geometry(), { style = 'minimal', border = 'rounded', title = ' Yazi ', title_pos = 'center' })
-  local state = { buf = buf, win = vim.api.nvim_open_win(buf, true, config), chooser = vim.fn.tempname() }
+  local state = { buf = buf, win = vim.api.nvim_open_win(buf, true, config),
+    chooser = vim.fn.tempname(), preview = vim.fn.tempname() }
   session = state
   state.job = vim.fn.jobstart({ vim.env.NVIM_ZED_ROOT .. '/yazi/yazi', '--chooser-file', state.chooser, path }, {
     term = true,
@@ -63,6 +75,7 @@ function M.open()
     env = {
       YAZI_CONFIG_HOME = vim.env.NVIM_ZED_ROOT .. '/config/yazi' .. (MiniIcons.config.style == 'ascii' and '/ascii' or ''),
       PATH = vim.env.NVIM_ZED_ROOT .. '/yazi:' .. vim.env.PATH,
+      NVIM_ZED_PREVIEW_FILE = state.preview,
     },
     on_exit = function(_, code) vim.schedule(function() finish(state, code) end) end,
   })
@@ -79,7 +92,12 @@ function M.open()
     require('panels').toggle_terminal()
   end, { buffer = buf, desc = 'Open shell terminal' })
   vim.api.nvim_create_autocmd('WinClosed', { pattern = tostring(state.win), once = true,
-    callback = function() if not state.finished then M.close() end end })
+    callback = function() vim.schedule(function()
+      if state.finished then return end
+      state.cancelled = true
+      if state.job then vim.fn.jobstop(state.job) end
+      finish(state, 0)
+    end) end })
   vim.cmd.startinsert()
 end
 

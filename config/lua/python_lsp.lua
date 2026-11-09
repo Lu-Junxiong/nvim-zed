@@ -2,18 +2,23 @@ local M = {}
 function M.setup()
   local capabilities = require('cmp_nvim_lsp').default_capabilities()
   local ty_settings = { ty = { disableLanguageServices = false } }
-  if vim.env.NVIM_ZED_PYTHON and vim.env.NVIM_ZED_PYTHON ~= '' then
-    local path = vim.fn.fnamemodify(vim.env.NVIM_ZED_PYTHON, ':p')
-    assert(vim.uv.fs_stat(path), 'NVIM_ZED_PYTHON path does not exist: ' .. path)
-    ty_settings.ty.configuration = { environment = { python = path } }
-  end
   local function root_dir(buf, on_dir)
-    on_dir(vim.fs.root(buf, { 'pyproject.toml', 'ty.toml', 'ruff.toml', '.ruff.toml', '.git' })
-      or vim.fs.dirname(vim.api.nvim_buf_get_name(buf)) or vim.fn.getcwd())
+    on_dir(require('python_env').project_root(vim.api.nvim_buf_get_name(buf)))
   end
   vim.lsp.config('ty', {
-    cmd = { 'ty', 'server' }, filetypes = { 'python' }, root_dir = root_dir,
+    cmd = { 'ty', 'server' }, filetypes = { 'python' },
+    root_dir = function(buf, on_dir)
+      local python = require('python_env')
+      local root = python.project_root(vim.api.nvim_buf_get_name(buf))
+      local env, err = python.resolve(root)
+      if not env then vim.notify(err, vim.log.levels.ERROR); return end
+      on_dir(root)
+    end,
     capabilities = capabilities, settings = ty_settings,
+    before_init = function(_, config)
+      local env = assert(require('python_env').resolve(config.root_dir))
+      config.settings.ty.configuration = { environment = { python = env.path } }
+    end,
   })
   vim.lsp.config('ruff', {
     cmd = { 'ruff', 'server' }, filetypes = { 'python' }, root_dir = root_dir,
@@ -44,7 +49,8 @@ function M.setup()
       local result = vim.system({ tool, '--version' }, { text = true }):wait()
       info[#info + 1] = vim.fn.exepath(tool) .. ': ' .. vim.trim(result.stdout or result.stderr or '')
     end
-    info[#info + 1] = 'Python override: ' .. (vim.env.NVIM_ZED_PYTHON or '(ty auto discovery; project config, active environment, .venv, PATH)')
+    local env, err = require('python_env').resolve()
+    info[#info + 1] = env and ('Python: ' .. env.path .. ' / ' .. env.source) or err
     info[#info + 1] = 'VIRTUAL_ENV: ' .. (vim.env.VIRTUAL_ENV or '(unset)')
     info[#info + 1] = 'CONDA_PREFIX: ' .. (vim.env.CONDA_PREFIX or '(unset)')
     for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do

@@ -12,6 +12,7 @@ function M.setup()
       { name = 'e  浏览文件     空格 e', section = '开始', action = function() require('file_manager').open() end },
       { name = 'g  搜索文本     空格 /', section = '开始', action = function() MiniPick.builtin.grep_live({ tool = 'rg' }) end },
       { name = 'n  新建文件', section = '开始', action = 'enew' },
+      { name = 's  恢复项目会话', section = '开始', action = function() require('project_session').restore() end },
       { name = 'h  快捷键说明', section = '开始', action = function()
         vim.cmd.edit(vim.fn.fnameescape(vim.env.NVIM_ZED_ROOT .. '/README.md'))
       end },

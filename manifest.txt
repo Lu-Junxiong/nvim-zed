@@ -17,3 +17,10 @@ Yazi v26.9.1 (static x86_64 Linux build)
 mime-ext.yazi c0529fc34e4649effb79ff6f4a86aec46beebb7f
 Neovim build source: https://github.com/neovim/neovim-releases/releases/tag/stable
 Old-system compatibility: binary symbol inspection, not tested on the target system
+Bundled monitor: nvitop 1.7.2, nvidia-ml-py 13.615.71, psutil 7.2.2
+Monitor runtime: existing CPython >=3.8 with curses and NVIDIA NVML
+psutil native extension: cp36-abi3, Linux x86_64, maximum GLIBC symbol 2.7
+Data preview: external Polars (tested 1.8.2 on CPython 3.8.5)
+mini.nvim runtime subset: bufremove, clue, extra, icons, pick, starter, statusline, tabline
+psutil runtime subset: Linux/POSIX modules only
+Bundled Python metadata: headers and notices only; pip installation records omitted

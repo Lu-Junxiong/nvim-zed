@@ -36,6 +36,9 @@ tar -xzf nvim-zed-linux-x86_64.tar.gz
 | 切换面板 | `Ctrl-h/j/k/l`；终端中 `Ctrl-k` 返回编辑区 |
 | 终端退出输入模式 | 连按两次 `Esc` |
 | 大纲 | `Space o` |
+| Python 环境路径与来源 | `Space v` |
+| CSV / TSV / Parquet 预览 | `Space p`；Yazi 中 `Ctrl-p` |
+| GPU / CPU / 进程监控 | `Space m`；`q` 或 `Esc` 关闭 |
 | Flash 跳转 | `Space j`，输入目标字符，再按字母标签；Esc 取消 |
 | 定义／引用／悬浮说明 | `gd` / `gr` / `K` |
 | 重命名／代码修复菜单 | `Space rn` / `Space ca` |
@@ -63,16 +66,29 @@ Ctrl-Tab 仅循环文件，跳过首页、终端等临时窗口，并保留未�
 
 - ty 负责类型检查、补全、跳转和重命名；Ruff 负责规范检查、格式化和整理 imports。修改均手动触发。
 - 补全优先当前文件，再补充已加载的同类型文件，并提供路径和 LSP 候选。Tab 确认，Enter 始终换行；Ctrl-n/p 选择、Ctrl-e 关闭、Ctrl-Space 手动触发。
-- ty 自动读取项目配置、已激活 virtualenv/Conda、项目 .venv 和 PATH。可用 `NVIM_ZED_PYTHON=/absolute/env/path ./nvim-zed/run /project` 指定环境；`:ZedInfo` 查看工具与 LSP 信息。
+- Python 环境按 `NVIM_ZED_PYTHON` → 已激活 virtualenv → 非 base Conda → 项目 `.venv` → Conda base → 启动前 PATH 中的 python3/python 选择。显式路径与已激活 virtualenv 无效时报告错误，不悄悄换环境。
+- ty、数据预览和 nvitop 共用这套选择；Python 文件状态栏显示环境名称，`Space v` 查看完整路径与来源，`:ZedInfo` 查看工具与 LSP。选择优先于 ty 配置中的 `environment.python`；其余 ty 项目设置继续生效。
+- 指定环境目录或解释器：`NVIM_ZED_PYTHON=/absolute/env/path ./nvim-zed/run /project`。更换环境后重启编辑器；shell 仍继承启动前的环境，不会自动激活上述覆盖路径。
+- 各项目首次选定的解释器在本次运行中保持固定，创建或更换 `.venv` 后须重启。无法选择 Python 时 ty 不启动，Ruff 仍可工作。
 - `Space o`：Python 使用 ty；JSON/JSONC、YAML/YML、INI/CFG 直接解析未保存内容，无需语言服务或 Node。
 - 结构路径包括嵌套键和从 0 开始的数组下标。YAML 多文档用 doc1、doc2 区分，别名不展开；INI 支持节、`=`/`:` 键及缩进多行值，不提供完整语法校验。
 - 诊断列表仅包含语言服务已经报告的结果，不保证扫描全部未打开文件。
 
 Git 差异默认比较暂存区；与最新提交比较用 `:Gitsigns diffthis HEAD`。整个仓库状态可在内置终端运行 `git status`、`git diff`。
 
+## 数据、监控与会话
+
+数据预览要求所选 Python 环境已有 Polars（本机验证 1.8.2），不需要 pandas 或 PyArrow。文件中按 `Space p`，或在 Yazi 将光标停在数据文件上按 `Ctrl-p`，可直接打开只读浮窗；目录和其他格式会留在 Yazi 并提示。也可执行 `:ZedPreview /path/to/data.parquet`，避免先加载大文件。`q` / `Esc` 关闭，`Ctrl-Tab` 关闭并切换文件。
+
+预览展示字段、类型、前 50 行和前 20 列；单元格超过 160 字符时截断。CSV 类型按前 50 行推断，默认逗号分隔且有表头；TSV 使用制表符。Parquet 使用文件类型信息和列投影。不统计全表、不修改文件；未保存的编辑不进入预览。采样不等于严格的内存上限，Parquet 行组、CSV 推断和超大单元格仍会产生读取开销；预览超时 15 秒会终止子进程。
+
+`Space m` 打开随包 nvitop，可查看 NVIDIA GPU、显存、CPU、内存和进程；`h` 查看工具帮助，`q` / `Esc` 关闭。需要已有 CPython 3.8+（含 curses）和可用的 NVIDIA 驱动 / NVML。依赖位于 `tools/nvitop/`，仅监控子进程加载，不向研究环境安装包；不包含 Python、CUDA 或驱动。WSL 或旧驱动可能有进程字段显示 N/A；无 GPU / 驱动时浮窗显示工具错误。
+
+退出时自动按启动项目目录保存文件列表、光标和分屏布局，下次仍显示首页。首页选择 `s` 后按 Enter 恢复；命令为 `:ZedSessionRestore`，手动保存为 `:ZedSessionSave`。只访问首页不会覆盖已有会话。存在未保存修改或运行中的内置终端时，先保存并退出终端再恢复。会话不保存未写入磁盘的内容，不重启 shell 或训练进程；状态在 `var/state/nvim-zed/sessions/`，不进入离线包。
+
 ## 维护和离线迁移
 
-配置在 config/，版本在 manifest.txt。已有 Neovim 配置与项目本地 Neovim 配置不会加载；Neovim 数据写入 var/。终端、Git、rg、ty 和 Ruff 恢复启动前的环境，继续读取原用户配置。
+配置在 config/，版本在 manifest.txt。mini.nvim 仅保留已启用的 8 个模块与对应帮助，nvitop 的 psutil 仅保留 Linux / POSIX 实现。已有 Neovim 配置与项目本地 Neovim 配置不会加载；Neovim 数据写入 var/。终端、Git、rg、ty 和 Ruff 恢复启动前的环境，继续读取原用户配置。
 
 关闭编辑器后移动整个目录即可。重新生成离线包只需：
 
@@ -82,6 +98,10 @@ Git 差异默认比较暂存区；与最新提交比较用 `:Gitsigns diffthis H
 
 打包当前工作目录中的运行内容，输出 nvim-zed-linux-x86_64.tar.gz。包内不含 Git 历史、var/ 编辑记录、测试和构建源码；未提交的配置修改也会打包。
 
+升级离线包时解压到新目录，避免保留已移除的旧插件文件。需要编辑记录时，关闭编辑器后复制旧目录的 `var/`。
+
 仓库保留配置回归检查和固定版本解析器源码。`./tests/check` 在临时目录检查；允许命名空间时可用 `unshare -Urn ./tests/check` 断网验证。真实终端按键检查需要创建本地 Unix 套接字。也可用 `./tests/check /path/to/extracted/nvim-zed` 验证离线包。
+
+带 Polars 的 Python 可用 `ZED_TEST_PYTHON=/absolute/python ./tests/check` 额外检查环境、数据预览、监控浮窗和会话；`python tests/preview.py` 检查真实 CSV / TSV / Parquet 样本与限制。
 
 仅重建解析器时运行 `./scripts/build-parsers`，需要 C 编译器；日常运行不需要编译器。
