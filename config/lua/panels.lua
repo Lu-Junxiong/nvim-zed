@@ -4,6 +4,12 @@ local terminal_running = false
 local editor_win
 local changing_layout = false
 
+local function is_editor_window(win)
+  local buf = vim.api.nvim_win_get_buf(win)
+  return vim.api.nvim_win_get_config(win).relative == ''
+    and (vim.bo[buf].buftype == '' or vim.bo[buf].filetype == 'ministarter')
+end
+
 local function terminal_window()
   if terminal_buf and vim.api.nvim_buf_is_valid(terminal_buf) then
     local win = vim.fn.bufwinid(terminal_buf)
@@ -22,12 +28,12 @@ end
 function M.editor()
   if editor_win and vim.api.nvim_win_is_valid(editor_win)
       and vim.api.nvim_win_get_tabpage(editor_win) == vim.api.nvim_get_current_tabpage()
-      and vim.bo[vim.api.nvim_win_get_buf(editor_win)].buftype == '' then
+      and is_editor_window(editor_win) then
     vim.api.nvim_set_current_win(editor_win)
     return
   end
   for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-    if vim.bo[vim.api.nvim_win_get_buf(win)].buftype == '' and vim.api.nvim_win_get_config(win).relative == '' then
+    if is_editor_window(win) then
       vim.api.nvim_set_current_win(win)
       editor_win = win
       return
@@ -37,10 +43,9 @@ function M.editor()
   editor_win = vim.api.nvim_get_current_win()
 end
 
-local function show_terminal(focus)
+local function show_terminal()
   changing_layout = true
   M.editor()
-  local return_win = vim.api.nvim_get_current_win()
   local win = terminal_window()
   if win then
     vim.api.nvim_set_current_win(win)
@@ -71,12 +76,7 @@ local function show_terminal(focus)
   vim.wo.signcolumn = 'no'
   vim.wo.winfixheight = true
   resize_terminal()
-  if focus then
-    vim.cmd.startinsert()
-  else
-    vim.api.nvim_set_current_win(return_win)
-    vim.cmd.stopinsert()
-  end
+  vim.cmd.startinsert()
   changing_layout = false
 end
 
@@ -88,7 +88,7 @@ function M.toggle_terminal()
     M.editor()
     vim.cmd.stopinsert()
   else
-    show_terminal(true)
+    show_terminal()
   end
 end
 
@@ -155,7 +155,7 @@ function M.setup()
   vim.api.nvim_create_autocmd('WinEnter', {
     callback = function()
       if changing_layout then return end
-      if vim.bo.buftype == '' and vim.api.nvim_win_get_config(0).relative == '' then
+      if is_editor_window(vim.api.nvim_get_current_win()) then
         editor_win = vim.api.nvim_get_current_win()
       end
       if vim.bo.buftype == 'terminal' and terminal_running then vim.cmd.startinsert() end
@@ -169,8 +169,11 @@ function M.setup()
         changing_layout = true
         M.editor()
         editor_win = vim.api.nvim_get_current_win()
+        require('startup').open_if_empty()
         require('nvim-tree.api').tree.open()
-        show_terminal(false)
+        M.editor()
+        vim.cmd.stopinsert()
+        changing_layout = false
       end)
     end,
   })

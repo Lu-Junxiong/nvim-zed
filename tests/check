@@ -34,4 +34,5 @@ unset XDG_CACHE_HOME XDG_DATA_DIRS
 export VIMINIT='lua error("Unrelated VIMINIT loaded")'
 export NVIM_APPNAME=nvim
 export NVIM_LOG_FILE="$work_dir/harness.log"
+timeout 30s "$bundle_dir/neovim/bin/nvim" --clean -l "$repo_dir/tests/startup.lua"
 timeout 60s "$bundle_dir/neovim/bin/nvim" --clean -l "$repo_dir/tests/check.lua"

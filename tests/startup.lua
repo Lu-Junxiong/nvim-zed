@@ -1,0 +1,48 @@
+local root = assert(vim.env.ZED_TEST_BUNDLE)
+local project = vim.env.ZED_TEST_WORK .. '/project'
+local outsider = project .. '-other/outsider.txt'
+vim.fn.mkdir(project .. '-other', 'p')
+vim.fn.writefile({ 'outside the project' }, outsider)
+local history = { project .. '/a.txt', outsider, project .. '/missing.txt' }
+local child = vim.fn.jobstart({ root .. '/run', project, '--embed', '+lua vim.v.oldfiles=' .. vim.inspect(history) }, { rpc = true })
+assert(child > 0)
+local function call(code) return vim.rpcrequest(child, 'nvim_exec_lua', code, {}) end
+local function input(keys) vim.rpcrequest(child, 'nvim_input', keys) end
+local function wait(code, label)
+  assert(vim.wait(5000, function() return call(code) == true end, 20), label)
+  print('PASS ' .. label)
+end
+local ok, err = pcall(function()
+  vim.rpcrequest(child, 'nvim_ui_attach', 120, 40, { rgb = true })
+  wait([[return vim.bo.filetype=='ministarter' and #vim.api.nvim_list_wins()==2]], 'home page and right tree at startup')
+  wait([[for _,b in ipairs(vim.api.nvim_list_bufs()) do if vim.bo[b].buftype=='terminal' then return false end end; return true]], 'no shell starts automatically')
+  wait([[local text=table.concat(vim.api.nvim_buf_get_lines(0,0,-1,false),' '); return text:find('a.txt',1,true)~=nil and text:find('outsider.txt',1,true)==nil and text:find('missing.txt',1,true)==nil]], 'recent files restricted to readable project files')
+  input('<C-p>')
+  wait('return MiniPick.is_picker_active()', 'file search works from home')
+  input('<Esc>')
+  wait([[return not MiniPick.is_picker_active() and vim.bo.filetype=='ministarter' and #vim.api.nvim_list_wins()==2]], 'search cancel returns to home without extra windows')
+  input(' /')
+  wait('return MiniPick.is_picker_active()', 'project search works from home')
+  input('<Esc>')
+  wait([[return not MiniPick.is_picker_active() and vim.bo.filetype=='ministarter']], 'project search cancel preserves home')
+  input('<C-\\>')
+  wait([[return vim.bo.buftype=='terminal' and #vim.api.nvim_list_wins()==3]], 'first terminal opens below home')
+  local job = call('return vim.b.terminal_job_id')
+  input('<C-\\>')
+  wait([[return vim.bo.filetype=='ministarter' and #vim.api.nvim_list_wins()==2]], 'hiding terminal restores home')
+  input('<C-\\>')
+  wait('return vim.b.terminal_job_id==' .. job .. ' and vim.api.nvim_get_mode().mode=="t"', 'same terminal process restored')
+  input('<C-\\>')
+  wait([[return vim.bo.filetype=='ministarter']], 'return to home')
+  input('r1<CR>')
+  wait([[return vim.api.nvim_buf_get_name(0):match('a.txt$')~=nil and vim.bo.buftype=='' and #vim.api.nvim_list_wins()==2]], 'recent file opens in home window')
+  call([[MiniStarter.open()]])
+  input('n<CR>')
+  wait([[return vim.bo.buftype=='' and vim.api.nvim_buf_get_name(0)=='' and vim.bo.modifiable]], 'new file action creates editable buffer')
+end)
+if not ok then
+  print(err)
+  print(vim.inspect(call([[return {mode=vim.api.nvim_get_mode(),file=vim.api.nvim_buf_get_name(0),messages=vim.api.nvim_exec2('messages',{output=true}).output}]])))
+end
+vim.fn.jobstop(child)
+vim.cmd(ok and 'qa!' or 'cquit')
