@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)
+bundle_dir=${1:-$repo_dir}
+work_dir=$(mktemp -d /tmp/nvim-zed-check.XXXXXX)
+trap 'rm -rf -- "$work_dir"' EXIT
+mkdir -p "$work_dir/moved bundle/nvim-zed" "$work_dir/project" "$work_dir/host config/git" "$work_dir/host config/nvim"
+tar --exclude=./var --exclude=./.git -C "$bundle_dir" -cf - . | tar -xf - -C "$work_dir/moved bundle/nvim-zed"
+printf '[zedcheck]\n marker = host-settings-visible\n' > "$work_dir/host config/git/config"
+printf 'error("Unrelated Neovim configuration loaded")\n' > "$work_dir/host config/nvim/init.lua"
+printf 'alpha\n' > "$work_dir/project/a.txt"
+printf 'beta\n' > "$work_dir/project/b.txt"
+cat > "$work_dir/project/example.py" <<'PY'
+import os
+
+class Calculator:
+    def double(self, value: int) -> int:
+        return value * 2
+
+def greet(name: str) -> str:
+    return "hello " + name
+
+value: int = "wrong"
+items=[1,2,3]
+PY
+printf '[project]\nname="zed-check"\nversion="0.0.0"\n' > "$work_dir/project/pyproject.toml"
+export ZED_TEST_WORK="$work_dir"
+export ZED_TEST_BUNDLE="$work_dir/moved bundle/nvim-zed"
+export XDG_CONFIG_HOME="$work_dir/host config"
+export XDG_DATA_HOME=''
+export XDG_STATE_HOME="$work_dir/host state"
+export XDG_CONFIG_DIRS="$work_dir/host dirs"
+unset XDG_CACHE_HOME XDG_DATA_DIRS
+export VIMINIT='lua error("Unrelated VIMINIT loaded")'
+export NVIM_APPNAME=nvim
+export NVIM_LOG_FILE="$work_dir/harness.log"
+timeout 60s "$bundle_dir/neovim/bin/nvim" --clean -l "$repo_dir/tests/check.lua"

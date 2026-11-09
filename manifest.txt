@@ -10,3 +10,4 @@ Validated: Linux x86_64, glibc 2.39
 ELF required GLIBC symbol version: 2.34
 External tools tested: ty 0.0.99, ruff 0.16.10
 olimorris/onedarkpro.nvim 24c806cb85c1f84d9faaff457cf7aa87c685a070
+folke/flash.nvim 5f0f270fdc7c5b0c21d903ee85b9cb06f2ac636a

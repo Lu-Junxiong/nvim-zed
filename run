@@ -11,6 +11,16 @@ for tool in ty ruff rg git; do
         exit 1
     fi
 done
+# Preserve unset versus empty values; only the editor uses the private XDG paths.
+for name in PATH XDG_CONFIG_HOME XDG_DATA_HOME XDG_STATE_HOME XDG_CACHE_HOME XDG_CONFIG_DIRS XDG_DATA_DIRS NVIM_APPNAME NVIM_LOG_FILE VIMRUNTIME VIM VIMINIT EXINIT GVIMINIT MYVIMRC VIMPLUGINS LUA_PATH LUA_CPATH; do
+    saved_name="NVIM_ZED_HOST_$name"
+    if [[ -v $name ]]; then
+        export "$saved_name=${!name}"
+    else
+        unset "$saved_name"
+    fi
+done
+export NVIM_ZED_HOST_SHELL="${SHELL:-/bin/sh}"
 export NVIM_ZED_ROOT="$bundle_dir"
 export NVIM_APPNAME=nvim-zed
 export XDG_CONFIG_HOME="$bundle_dir/var/config"
@@ -19,8 +29,10 @@ export XDG_STATE_HOME="$bundle_dir/var/state"
 export XDG_CACHE_HOME="$bundle_dir/var/cache"
 export XDG_CONFIG_DIRS="$bundle_dir/var/config"
 export XDG_DATA_DIRS="$bundle_dir/var/data"
+export NVIM_LOG_FILE="$bundle_dir/var/state/nvim-zed/nvim.log"
 export VIMRUNTIME="$bundle_dir/neovim/share/nvim/runtime"
 export VIM="$bundle_dir/neovim/share/nvim"
+export PATH="$bundle_dir/bin:$PATH"
 unset VIMINIT EXINIT GVIMINIT MYVIMRC VIMPLUGINS LUA_PATH LUA_CPATH
 mkdir -p -- "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
 if [[ $# -gt 0 && -d $1 ]]; then

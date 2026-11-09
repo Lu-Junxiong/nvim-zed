@@ -21,7 +21,8 @@ function M.setup()
     on_attach = function(client) client.server_capabilities.hoverProvider = false end,
   })
   vim.lsp.enable({ 'ty', 'ruff' })
-  vim.api.nvim_create_autocmd('LspAttach', {
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'python',
     callback = function(args)
       local opts = function(desc) return { buffer = args.buf, desc = desc } end
       vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts('Go to definition'))
@@ -32,7 +33,7 @@ function M.setup()
       vim.keymap.set('n', '<leader>f', function()
         vim.lsp.buf.format({ name = 'ruff', async = false, timeout_ms = 5000 })
       end, opts('Format with Ruff'))
-      vim.keymap.set('n', '<leader>oi', function()
+      vim.keymap.set('n', '<leader>ci', function()
         vim.lsp.buf.code_action({ context = { only = { 'source.organizeImports' }, diagnostics = {} }, apply = true })
       end, opts('Organize imports'))
     end,

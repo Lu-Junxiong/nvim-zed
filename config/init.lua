@@ -1,5 +1,5 @@
 local root = assert(vim.env.NVIM_ZED_ROOT, 'Start with ./run')
-vim.opt.runtimepath = { root .. '/config', vim.env.VIMRUNTIME }
+vim.opt.runtimepath = { root .. '/config', vim.env.VIMRUNTIME, root .. '/neovim/lib/nvim' }
 vim.opt.packpath = {}
 for _, path in ipairs(vim.fn.glob(root .. '/plugins/*', false, true)) do
   vim.opt.runtimepath:append(path)
@@ -14,6 +14,7 @@ vim.g.loaded_node_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
 
+vim.opt.shell = '"' .. vim.fn.escape(root .. '/bin/shell', '\\"') .. '"'
 vim.opt.termguicolors = true
 vim.opt.background = 'light'
 require('theme')
@@ -40,7 +41,6 @@ vim.opt.updatetime = 250
 vim.opt.undofile = true
 vim.opt.exrc = false
 vim.opt.modeline = false
-vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 vim.opt.shortmess:append('I')
 vim.diagnostic.config({
   virtual_text = false,
@@ -59,8 +59,15 @@ require('panels').setup()
 require('completion').setup()
 require('python_lsp').setup()
 require('git_ui').setup()
+require('flash').setup({
+  modes = { char = { enabled = false }, search = { enabled = false } },
+  search = { exclude = {
+    function(win) return vim.bo[vim.api.nvim_win_get_buf(win)].buftype ~= '' or not vim.api.nvim_win_get_config(win).focusable end,
+  } },
+})
 
 local map = vim.keymap.set
+map({ 'n', 'x', 'o' }, '<leader>j', function() require('flash').jump() end, { desc = 'Flash jump' })
 map('i', 'jk', '<Esc>', { desc = 'Normal mode' })
 map('n', '<C-p>', function() require('panels').editor(); MiniPick.builtin.files({ tool = 'rg' }) end, { desc = 'Find files' })
 map('n', '<leader>/', function() require('panels').editor(); MiniPick.builtin.grep_live({ tool = 'rg' }) end, { desc = 'Search project' })
@@ -74,12 +81,12 @@ map('n', '<leader>o', function()
   end
   MiniExtra.pickers.lsp({ scope = 'document_symbol' }, { source = { name = 'Outline' } })
 end, { desc = 'File outline' })
-map('n', '[b', '<Cmd>bprevious<CR>', { desc = 'Previous file' })
-map('n', ']b', '<Cmd>bnext<CR>', { desc = 'Next file' })
-map('n', '<leader>bd', function() MiniBufremove.delete() end, { desc = 'Close file' })
-map('n', '<leader>w', '<Cmd>write<CR>', { desc = 'Save' })
+map('n', '[b', function() require('panels').editor(); vim.cmd.bprevious() end, { desc = 'Previous file' })
+map('n', ']b', function() require('panels').editor(); vim.cmd.bnext() end, { desc = 'Next file' })
+map('n', '<leader>x', function() require('panels').editor(); MiniBufremove.delete() end, { desc = 'Close file' })
+map('n', '<leader>w', function() require('panels').editor(); vim.cmd.write() end, { desc = 'Save' })
 map('n', '<leader>d', vim.diagnostic.open_float, { desc = 'Show diagnostic' })
 map('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = 'Previous diagnostic' })
 map('n', ']d', function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = 'Next diagnostic' })
 map('n', '<Esc>', '<Cmd>nohlsearch<CR>', { desc = 'Clear search highlight' })
-map('n', '<leader>?', function() vim.cmd('edit ' .. vim.fn.fnameescape(root .. '/README.md')) end, { desc = 'Help' })
+map('n', '<leader>?', function() require('panels').editor(); vim.cmd('edit ' .. vim.fn.fnameescape(root .. '/README.md')) end, { desc = 'Help' })

@@ -17,7 +17,7 @@ tar -xzf nvim-zed-linux-x86_64.tar.gz
 ```
 
 也可以 `./nvim-zed/run /path/to/project relative/file.py`。不传目录则使用当前目录。
-启动时显示文件树，焦点保留在编辑区；底部终端按需打开。
+启动时自动显示右侧文件树和底部单个终端，焦点保留在编辑区。终端横跨底部，占高度约 25%，随窗口缩放调整。
 
 ## 系统要求
 
@@ -41,8 +41,9 @@ tar -xzf nvim-zed-linux-x86_64.tar.gz
 | 搜索、切换已打开文件 | `Space b` |
 | 搜索当前文件内容 | `Space s` 或原生 `/` |
 | 当前文件大纲（函数、类、方法等） | `Space o` |
+| 屏幕内快速跳转（Flash） | `Space j` |
 | 上一个／下一个文件 | `[b` / `]b` |
-| 关闭当前文件 | `Space bd` |
+| 关闭当前文件 | `Space x` |
 | 保存 | `Space w` 或 `:w` |
 | 文件树显示／隐藏 | `Space e` |
 | 文件树展开或打开／收起 | `l` / `h` |
@@ -52,7 +53,7 @@ tar -xzf nvim-zed-linux-x86_64.tar.gz
 | 定义／引用／悬浮说明 | `gd` / `gr` / `K` |
 | 重命名 | `Space rn` |
 | Ruff 格式化 | `Space f` |
-| 整理 imports／代码修复菜单 | `Space oi` / `Space ca` |
+| 整理 imports／代码修复菜单 | `Space ci` / `Space ca` |
 | 查看诊断 | `Space d` |
 | 上一个／下一个诊断 | `[d` / `]d` |
 | 上一个／下一个 Git 修改块 | `[c` / `]c` |
@@ -62,14 +63,16 @@ tar -xzf nvim-zed-linux-x86_64.tar.gz
 | 本说明 | `Space ?` |
 
 搜索窗口：直接输入、`Ctrl-n/p` 或方向键选项、`Enter` 打开、`Esc` 取消。
+
+Flash：普通模式按 `Space j`，输入目标字符，再按目标旁的字母标签跳转；`Esc` 取消。支持可见编辑窗口间跳转，排除文件树、终端和补全窗口。原生 `f/F/t/T`、`;`、`,` 保持不变。
 搜索遵循 rg 的忽略规则，默认不扫描隐藏文件及被忽略目录。
-终端隐藏后进程继续运行。面板切换键和 `Ctrl-\` 被编辑器接管；`jk` 不影响 shell。
+终端从项目目录启动，继承已激活的 Python 环境；隐藏后进程继续运行。执行 `exit` 后不会自动重启，下次按 `Ctrl-\` 创建新终端。面板切换键和 `Ctrl-\` 被编辑器接管；`jk` 不影响 shell。
 退出整个 Neovim 会结束内置终端，不会自动保存文件；用 `:wa` 保存所有修改，`:qa` 退出。
 Git 差异页默认比较暂存区；也可用 `:Gitsigns diffthis HEAD` 查看与 HEAD 的差异。
 
 ## 补全和 Python
 
-- buffer 单词优先，同时提供路径和 ty 语义候选；候选右侧标明 `[buf]`、`[path]`、`[ty]`。
+- 当前 buffer 的单词优先，其他已加载的同类型文件提供补充；同时提供路径和 ty 语义候选；候选右侧标明 `[buf]`、`[path]`、`[ty]`。
 - `Tab` 接受已选项，未选择时接受首项；没有候选时正常缩进。
 - `Enter` 始终换行。`Ctrl-n/p` 选项，`Ctrl-e` 关闭菜单，`Ctrl-Space` 手动触发。
 - ty 负责类型检查、补全、跳转和重命名；Ruff 负责规范检查、格式化和整理 imports。
@@ -90,7 +93,10 @@ NVIM_ZED_PYTHON=/path/to/env ./nvim-zed/run /path/to/project
 ## 配置与搬迁
 
 配置在 `config/init.lua` 和 `config/lua/`。主题在 `config/lua/theme.lua`，使用随包的 onedarkpro.nvim（onelight）。已有的 ~/.config/nvim 等配置不会加载。
-运行数据全部写入包内 `var/`；不修改现有 Neovim 配置，也不自动执行项目本地 Neovim 配置。
+Neovim 的运行数据全部写入包内 `var/`；不修改现有 Neovim 配置，也不自动执行项目本地 Neovim 配置。
+终端、`:!`、Git、rg、ty 和 Ruff 通过 `bin/` 中的统一入口恢复启动前的环境，继续读取你原有的用户配置；项目配置照常生效。
+
+`[b`、`]b`、`Space x` 和 `Space w` 会先返回编辑区，不会把终端或文件树替换成文件。
 
 退出 Neovim 后移动整个目录即可。迁移不需要联网。
 发布压缩包不带编辑历史；自己重新打包时，可以在退出后删除 `var/`，清除日志、撤销记录和历史路径。
@@ -105,8 +111,20 @@ NVIM_ZED_PYTHON=/path/to/env ./nvim-zed/run /path/to/project
 
 ## 从仓库制作离线包
 
-在仓库目录执行，打包当前已提交版本，不包含运行缓存或 Git 历史：
+在仓库目录执行，打包当前已提交版本。`.gitattributes` 自动排除插件测试、示例和开发脚本；保留运行代码、帮助文档与依赖许可证，不包含运行缓存或 Git 历史：
 
 ```bash
 git archive --format=tar.gz --prefix=nvim-zed/ -o nvim-zed-linux-x86_64.tar.gz HEAD
 ```
+
+## 检查配置
+
+仓库中运行 `./tests/check`，会在临时目录复制配置并检查启动布局、环境隔离、Git 用户配置、面板保护、搜索、大纲、Python 诊断与格式化、Flash 和补全按键，不改动项目文件。
+
+Linux 允许非特权用户创建命名空间时，可断网验证：
+
+```bash
+unshare -Urn ./tests/check
+```
+
+也可以用 `./tests/check /path/to/extracted/nvim-zed` 验证解压后的精简包。检查脚本本身不会包含在离线包中。

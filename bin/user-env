@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+command_name=${0##*/}
+if [[ $command_name == shell ]]; then
+    command_name=$NVIM_ZED_HOST_SHELL
+fi
+# All managed tools share the same process boundary, including plugin subprocesses.
+for name in PATH XDG_CONFIG_HOME XDG_DATA_HOME XDG_STATE_HOME XDG_CACHE_HOME XDG_CONFIG_DIRS XDG_DATA_DIRS NVIM_APPNAME NVIM_LOG_FILE VIMRUNTIME VIM VIMINIT EXINIT GVIMINIT MYVIMRC VIMPLUGINS LUA_PATH LUA_CPATH; do
+    saved_name="NVIM_ZED_HOST_$name"
+    if [[ -v $saved_name ]]; then
+        export "$name=${!saved_name}"
+    else
+        unset "$name"
+    fi
+    unset "$saved_name"
+done
+unset NVIM_ZED_HOST_SHELL NVIM_ZED_ROOT
+exec "$command_name" "$@"
