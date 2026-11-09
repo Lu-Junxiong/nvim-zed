@@ -1,0 +1,12 @@
+Neovim v0.12.6
+nvim-mini/mini.nvim f9ac12d7cbd2563cfc2cce9a8152fc8df2ad0d6f
+nvim-tree/nvim-tree.lua 7e1da84aaffb413e1fa47b3895e5caa12501142d
+hrsh7th/nvim-cmp fe29aba4117227a6df637bc41e4b4fb4e98864a0
+hrsh7th/cmp-buffer b74fab3656eea9de20a9b8116afa3cfc4ec09657
+hrsh7th/cmp-path c642487086dbd9a93160e1679a1327be111cbc25
+hrsh7th/cmp-nvim-lsp cd4ee08a988deb47ac3726f418fb27fe1a95729d
+lewis6991/gitsigns.nvim ef707fb93301a9b856f36eae4c8f56f5b988a794
+Validated: Linux x86_64, glibc 2.39
+ELF required GLIBC symbol version: 2.34
+External tools tested: ty 0.0.99, ruff 0.16.10
+olimorris/onedarkpro.nvim 24c806cb85c1f84d9faaff457cf7aa87c685a070

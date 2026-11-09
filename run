@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+bundle_dir=$(CDPATH= cd -- "$(dirname -- "$(readlink -f -- "$0")")" && pwd -P)
+if [[ $(uname -m) != x86_64 || $(uname -s) != Linux ]]; then
+    printf 'This package requires Linux x86_64.\n' >&2
+    exit 1
+fi
+for tool in ty ruff rg git; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+        printf 'Missing command in PATH: %s\n' "$tool" >&2
+        exit 1
+    fi
+done
+export NVIM_ZED_ROOT="$bundle_dir"
+export NVIM_APPNAME=nvim-zed
+export XDG_CONFIG_HOME="$bundle_dir/var/config"
+export XDG_DATA_HOME="$bundle_dir/var/data"
+export XDG_STATE_HOME="$bundle_dir/var/state"
+export XDG_CACHE_HOME="$bundle_dir/var/cache"
+export XDG_CONFIG_DIRS="$bundle_dir/var/config"
+export XDG_DATA_DIRS="$bundle_dir/var/data"
+export VIMRUNTIME="$bundle_dir/neovim/share/nvim/runtime"
+export VIM="$bundle_dir/neovim/share/nvim"
+unset VIMINIT EXINIT GVIMINIT MYVIMRC VIMPLUGINS LUA_PATH LUA_CPATH
+mkdir -p -- "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
+if [[ $# -gt 0 && -d $1 ]]; then
+    cd -- "$1"
+    shift
+fi
+exec "$bundle_dir/neovim/bin/nvim" -u "$bundle_dir/config/init.lua" "$@"
