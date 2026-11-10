@@ -58,7 +58,9 @@
         "context": "ProjectPanel && not_editing",
         "bindings": {
             "space e": "workspace::ToggleRightDock",
-            "space o": "outline_panel::ToggleFocus"
+            "space o": "outline_panel::ToggleFocus",
+            "y p": "project_panel::CopyPath",
+            "y shift-p": "workspace::CopyRelativePath"
         }
     },
     {
@@ -119,6 +121,12 @@
             "ctrl-v": "editor::Paste",
             "ctrl-x": "editor::Cut",
             "ctrl-a": "editor::SelectAll"
+        }
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "f5": ["task::Spawn", { "task_name": "Run Python" }]
         }
     }
 ]
