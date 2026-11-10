@@ -46,6 +46,12 @@
         }
     },
     {
+        "context": "Editor && mode == full && (vim_mode == normal || vim_mode == visual) && !menu",
+        "bindings": {
+            "space j": "vim::HelixJumpToWord"
+        }
+    },
+    {
         // Both panels are docked on the right in settings.json.
         // Repeat the same shortcut to hide the dock and focus the editor.
         // ProjectPanel itself has the menu flag; do not exclude menu here.
