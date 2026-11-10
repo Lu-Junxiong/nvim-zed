@@ -1,33 +1,109 @@
-// Zed keymap
-//
-// For information on binding keys, see the Zed
-// documentation: https://zed.dev/docs/key-bindings
-//
-// To see the default key bindings run `zed: open default keymap`
-// from the command palette.
+// Windows Zed bindings aligned with nvim-zed. Editor Space sequences use normal mode.
+// Keep Windows clipboard shortcuts; leave text input and completion menus alone.
 [
     {
         "context": "Workspace",
         "bindings": {
-            // "shift shift": "file_finder::Toggle"
+            "ctrl-\\": "terminal_panel::Toggle"
         }
     },
     {
-        "context": "Editor && vim_mode == insert",
+        "context": "Editor && mode == full && vim_mode == insert",
         "bindings": {
             "j k": "vim::NormalBefore"
         }
     },
     {
-        "context": "Editor && vim_mode == normal && !menu",
+        "context": "Editor && mode == full && vim_mode == normal && !menu",
         "bindings": {
-            "space e": "project_panel::ToggleFocus"
+            // Files and search. The tab list is limited to the active pane.
+            "ctrl-p": "file_finder::Toggle",
+            "space e": "project_panel::ToggleFocus",
+            "space o": "outline_panel::ToggleFocus",
+            "space /": "pane::DeploySearch",
+            "space b": "tab_switcher::OpenInActivePane",
+            "space s": "buffer_search::Deploy",
+            "space w": "workspace::Save",
+            "space x": "pane::CloseActiveItem",
+
+            // Language tools. Hover includes the diagnostic at the cursor.
+            "g r": "editor::FindAllReferences",
+            "space r n": "editor::Rename",
+            "space c a": "editor::ToggleCodeActions",
+            "space f": "editor::Format",
+            "space c i": "editor::OrganizeImports",
+            "space d": "editor::Hover",
+            "space q": "diagnostics::Deploy",
+
+            // Zed shows changes inline rather than in a floating preview.
+            "space h p": "editor::ToggleSelectedDiffHunks",
+
+            // Navigation overrides Ctrl-h search/replace and Ctrl-j dock toggle.
+            "ctrl-h": "workspace::ActivatePaneLeft",
+            "ctrl-j": "workspace::ActivatePaneDown",
+            "ctrl-k": "workspace::ActivatePaneUp",
+            "ctrl-l": "workspace::ActivatePaneRight"
         }
     },
     {
-        "context": "Editor && vim_mode == normal",
+        // Both panels are docked on the right in settings.json.
+        // Repeat the same shortcut to hide the dock and focus the editor.
+        // ProjectPanel itself has the menu flag; do not exclude menu here.
+        "context": "ProjectPanel && not_editing",
         "bindings": {
-            "space o": "outline_panel::Toggle"
+            "space e": "workspace::ToggleRightDock",
+            "space o": "outline_panel::ToggleFocus"
+        }
+    },
+    {
+        "context": "OutlinePanel && not_editing",
+        "bindings": {
+            "space e": "project_panel::ToggleFocus",
+            "space o": "workspace::ToggleRightDock"
+        }
+    },
+    {
+        // ToggleFocus initially focuses the outline's symbol search editor.
+        // Match that child editor explicitly so its text input does not win.
+        "context": "OutlinePanel > Editor",
+        "bindings": {
+            "space o": "workspace::ToggleRightDock",
+            "space e": "project_panel::ToggleFocus",
+            "ctrl-h": "workspace::ActivatePaneLeft",
+            "ctrl-\\": "terminal_panel::Toggle"
+        }
+    },
+    {
+        "context": "(ProjectPanel || OutlinePanel) && not_editing",
+        "bindings": {
+            "ctrl-h": "workspace::ActivatePaneLeft",
+            "ctrl-j": "workspace::ActivatePaneDown",
+            "ctrl-k": "workspace::ActivatePaneUp",
+            "ctrl-l": "workspace::ActivatePaneRight",
+            "ctrl-\\": "terminal_panel::Toggle"
+        }
+    },
+    {
+        // Override the Editor-level default Ctrl-backslash split binding.
+        "context": "Editor && mode == full",
+        "bindings": {
+            "ctrl-\\": "terminal_panel::Toggle"
+        }
+    },
+    {
+        "context": "Editor && mode == full && !menu",
+        "bindings": {
+            // Cycle tabs in display order, including while inserting text.
+            "ctrl-tab": "pane::ActivateNextItem",
+            "ctrl-shift-tab": "pane::ActivatePreviousItem"
+        }
+    },
+    {
+        "context": "Terminal",
+        "bindings": {
+            // Return from the bottom terminal to the editor above it.
+            "ctrl-k": "workspace::ActivatePaneUp",
+            "ctrl-\\": "terminal_panel::Toggle"
         }
     },
     {

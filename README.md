@@ -20,6 +20,45 @@ tar -xzf nvim-zed-linux-x86_64.tar.gz
 
 统一使用 Neovim 0.12.5 的 [旧系统兼容构建](https://github.com/neovim/neovim-releases)，Yazi 为静态构建。版本见 manifest.txt。glibc 下限根据二进制符号检查，本机实测 glibc 2.39；未在目标旧系统实测。
 
+## Windows Zed 快捷键
+
+`zed/settings.json` 和 `zed/keymap.json` 保存 Windows Zed 用户配置。Windows 配置应保持为普通文件：指向 WSL 的 Windows 符号链接会导致 Zed 在 WSL 项目中打开设置时出现 I/O 错误，并影响配置监听。
+
+修改仓库配置后，在 Windows PowerShell 中执行以下命令同步到 Windows（不自动同步，无需管理员权限）：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "\\wsl.localhost\Ubuntu-24.04\home\lujx\nvim-zed\zed\sync-windows.ps1"
+```
+
+在 Zed 中修改配置后，用同一命令加 `-Direction pull` 同步回仓库。同步会用来源覆盖目标，覆盖前保存目标内容为 `.bak-*`；脚本也能将旧符号链接替换为普通文件。两端都有修改时，先比较备份并合并，脚本不会自动合并。
+
+Zed 开启 Vim 模式后，以下 `Space` 序列在编辑器普通模式使用：
+
+| 按键 | Windows Zed 操作 |
+| --- | --- |
+| `jk` | 插入模式退回普通模式 |
+| `Ctrl-p` | 搜索文件 |
+| `Space e` / `Space o` | 打开并聚焦文件树／大纲；在对应面板再按一次关闭右侧栏并返回编辑器 |
+| `Space /` / `Space s` | 搜索项目／当前文件 |
+| `Space b` | 当前分屏的已打开标签列表 |
+| `Space w` / `Space x` | 保存／关闭当前标签 |
+| `Ctrl-Tab` / `Ctrl-Shift-Tab` | 按标签顺序前后切换，插入模式也可用 |
+| `Space rn` / `Space ca` | 重命名／代码操作 |
+| `Space f` / `Space ci` | 格式化／整理 imports |
+| `Space d` / `Space q` | 悬浮信息（含光标处诊断）／诊断列表 |
+| `Space hp` | 展开／收起当前 Git 修改块 |
+| `Ctrl-h/j/k/l` | 编辑器普通模式、文件树或大纲中向左／下／上／右切换面板或分屏 |
+| `Ctrl-\` | 显示／隐藏终端 |
+| 终端中的 `Ctrl-k` | 返回上方编辑区；覆盖 shell 的删除至行尾快捷键 |
+
+文件树里按 `Space o` 切到大纲，大纲里按 `Space e` 切到文件树；文件树重命名输入不拦截这些组合键。大纲默认聚焦符号搜索框，该输入框也支持 `Space o` 关闭、`Space e` 切到文件树、`Ctrl-h` 返回编辑区和 `Ctrl-\` 切换终端。代价是搜索框内连续输入“空格 + o/e”会触发快捷键，单独输入空格可能短暂等待下一键。
+
+文件树和大纲位于右侧，`Ctrl-h` 向左返回编辑区，保留面板显示；重复 `Space e/o` 则关闭右侧栏并返回。若面板仍显示但焦点已经回到编辑器，按对应快捷键会先重新聚焦面板，再按才关闭。`Ctrl-\` 在编辑器、文件树、大纲和终端中均用于切换终端，覆盖编辑器原有的同键分屏绑定。
+
+`gd`、`K`、`[b`/`]b`、`[d`/`]d`、`[c`/`]c`、`gcc`/`gc` 沿用 Zed Vim 默认绑定；`gr` 直接查找引用。保留 Windows 的 `Ctrl-c/v/x/a` 复制、粘贴、剪切和全选习惯，因此这些键覆盖对应的 Vim 操作。
+
+这里按操作意图对齐：Zed 的文件树代替 Yazi，文件内搜索使用搜索栏，修改块预览显示在行内；标签切换可能包含搜索结果等非文件标签。Flash、Polars 预览、nvitop、Python 环境信息和 Neovim 的 Git 并排差异开关暂未映射。
+
 ## 常用操作
 
 `Space` 表示普通模式先按空格，再按后续键；停留 300 毫秒显示快捷键提示。首页用方向键选择、Enter 执行，或输入菜单编号后按 Enter。最近文件只显示当前项目内的可读文件。
