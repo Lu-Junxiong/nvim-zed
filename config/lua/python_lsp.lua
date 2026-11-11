@@ -1,7 +1,7 @@
 local M = {}
 function M.setup()
   local capabilities = require('cmp_nvim_lsp').default_capabilities()
-  local ty_settings = { ty = { disableLanguageServices = false } }
+  local ty_settings = { ty = { disableLanguageServices = false, diagnosticMode = 'off' } }
   local function root_dir(buf, on_dir)
     on_dir(require('python_env').project_root(vim.api.nvim_buf_get_name(buf)))
   end
