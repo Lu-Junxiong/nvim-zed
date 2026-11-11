@@ -27,10 +27,12 @@ tar -xzf nvim-zed-linux-x86_64.tar.gz
 修改仓库配置后，在 Windows PowerShell 中执行以下命令同步到 Windows（不自动同步，无需管理员权限）：
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "\\wsl.localhost\Ubuntu-24.04\home\lujx\nvim-zed\zed\sync-windows.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "\\wsl.localhost\Ubuntu\home\lujx\nvim-zed\zed\sync-windows.ps1"
 ```
 
 在 Zed 中修改配置后，用同一命令加 `-Direction pull` 同步回仓库。同步会用来源覆盖目标，覆盖前保存目标内容为 `.bak-*`；脚本也能将旧符号链接替换为普通文件。两端都有修改时，先比较备份并合并，脚本不会自动合并。
+
+Zed 配置通过 `lsp.ty.settings.diagnosticMode = "off"` 关闭 ty 诊断，保留补全、跳转和悬浮文档；Ruff 检查和格式化仍然启用。上面的路径使用本机 WSL 发行版名 `Ubuntu`，其他机器需替换成自己的发行版名及仓库路径。
 
 Zed 开启 Vim 模式后，以下 `Space` 序列在编辑器普通模式使用：
 
