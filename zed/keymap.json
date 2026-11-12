@@ -2,6 +2,13 @@
 // Keep Windows clipboard shortcuts; leave text input and completion menus alone.
 [
     {
+        "context": "Editor && vim_mode == normal",
+        "bindings": {
+            "space y p": "workspace::CopyPath",
+            "space y r": "workspace::CopyRelativePath"
+        }
+    },
+    {
         "context": "Workspace",
         "bindings": {
             "ctrl-\\": "terminal_panel::Toggle"
